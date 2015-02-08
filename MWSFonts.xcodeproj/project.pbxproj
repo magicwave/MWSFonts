@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		07B747ED1A83D13500C47C9C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07B747EC1A83D13500C47C9C /* AppDelegate.swift */; };
-		07B747EF1A83D13500C47C9C /* MasterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07B747EE1A83D13500C47C9C /* MasterViewController.swift */; };
-		07B747F11A83D13500C47C9C /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07B747F01A83D13500C47C9C /* DetailViewController.swift */; };
+		07B747EF1A83D13500C47C9C /* MWSMasterFontFamiliesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07B747EE1A83D13500C47C9C /* MWSMasterFontFamiliesVC.swift */; };
+		07B747F11A83D13500C47C9C /* MWSFontDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07B747F01A83D13500C47C9C /* MWSFontDetailVC.swift */; };
 		07B747F41A83D13500C47C9C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 07B747F21A83D13500C47C9C /* Main.storyboard */; };
 		07B747F61A83D13500C47C9C /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 07B747F51A83D13500C47C9C /* Images.xcassets */; };
 		07B747F91A83D13500C47C9C /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 07B747F71A83D13500C47C9C /* LaunchScreen.xib */; };
@@ -30,8 +30,8 @@
 		07B747E71A83D13500C47C9C /* MWSFonts.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MWSFonts.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		07B747EB1A83D13500C47C9C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		07B747EC1A83D13500C47C9C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		07B747EE1A83D13500C47C9C /* MasterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterViewController.swift; sourceTree = "<group>"; };
-		07B747F01A83D13500C47C9C /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
+		07B747EE1A83D13500C47C9C /* MWSMasterFontFamiliesVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MWSMasterFontFamiliesVC.swift; sourceTree = "<group>"; };
+		07B747F01A83D13500C47C9C /* MWSFontDetailVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MWSFontDetailVC.swift; sourceTree = "<group>"; };
 		07B747F31A83D13500C47C9C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		07B747F51A83D13500C47C9C /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		07B747F81A83D13500C47C9C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -80,8 +80,8 @@
 			isa = PBXGroup;
 			children = (
 				07B747EC1A83D13500C47C9C /* AppDelegate.swift */,
-				07B747EE1A83D13500C47C9C /* MasterViewController.swift */,
-				07B747F01A83D13500C47C9C /* DetailViewController.swift */,
+				07B747EE1A83D13500C47C9C /* MWSMasterFontFamiliesVC.swift */,
+				07B747F01A83D13500C47C9C /* MWSFontDetailVC.swift */,
 				07B747F21A83D13500C47C9C /* Main.storyboard */,
 				07B747F51A83D13500C47C9C /* Images.xcassets */,
 				07B747F71A83D13500C47C9C /* LaunchScreen.xib */,
@@ -215,8 +215,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				07B747F11A83D13500C47C9C /* DetailViewController.swift in Sources */,
-				07B747EF1A83D13500C47C9C /* MasterViewController.swift in Sources */,
+				07B747F11A83D13500C47C9C /* MWSFontDetailVC.swift in Sources */,
+				07B747EF1A83D13500C47C9C /* MWSMasterFontFamiliesVC.swift in Sources */,
 				07B747ED1A83D13500C47C9C /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
