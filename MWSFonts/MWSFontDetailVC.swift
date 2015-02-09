@@ -98,7 +98,7 @@ class MWSFontDetailVC: UIViewController, UITableViewDataSource, UITableViewDeleg
     // Listen for a "clear button", i.e. empty text change to update cells.
     // Otherwise, we only update in shouldReturn - not for every char entered.
     func textFieldDidChange(textfield: UITextField) {
-        println("textfield.text changed to \(textfield.text)")
+//        println("textfield.text changed to \(textfield.text)")
         if textfield.text == nil || textfield.text.isEmpty {
             updateVisibleCells()
         }
@@ -146,7 +146,7 @@ class MWSFontDetailVC: UIViewController, UITableViewDataSource, UITableViewDeleg
     func updateFontSizeLabel() {
         if !fonts.isEmpty {
 //            println(NSString(format: "%.01f", slider.value))
-            lblPointSize.text = NSString(format: "%.01f", slider.value)
+            lblPointSize.text = (NSString(format: "%.01f", slider.value) as! String)
         }
     }
     
@@ -163,7 +163,7 @@ class MWSFontDetailVC: UIViewController, UITableViewDataSource, UITableViewDeleg
     func updateVisibleCells() {
         let visibleCells = tableView.visibleCells()
         for idx in 0..<visibleCells.count {
-            var cell = visibleCells[idx] as UITableViewCell
+            var cell = visibleCells[idx] as! UITableViewCell
             if let ip = tableView.indexPathForCell(cell) {
                 configureCellAtIndexPath(cell, ip: ip)
             }
@@ -172,14 +172,14 @@ class MWSFontDetailVC: UIViewController, UITableViewDataSource, UITableViewDeleg
     }
 
     func cellTextForIndexPath(indexPath: NSIndexPath) -> String {
-        if (countElements(textfield.text) > 0) { //textfield.text != nil && !textfield.text.isEmpty {
+        if (count(textfield.text) > 0) { //textfield.text != nil && !textfield.text.isEmpty {
             return textfield.text
         }
         return kTextLoremIpsum
     }
 
     func cellForEmptyTable() -> UITableViewCell {
-        let aCell = tableView.dequeueReusableCellWithIdentifier(cellId) as UITableViewCell
+        let aCell = tableView.dequeueReusableCellWithIdentifier(cellId) as! UITableViewCell
         aCell.textLabel?.text = "No font selection..."
         aCell.textLabel?.textColor = UIColor.lightGrayColor()
         return aCell
@@ -206,7 +206,7 @@ class MWSFontDetailVC: UIViewController, UITableViewDataSource, UITableViewDeleg
             return cellForEmptyTable()
         }
         
-        let cell = tableView.dequeueReusableCellWithIdentifier(cellId, forIndexPath: indexPath) as UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier(cellId, forIndexPath: indexPath) as! UITableViewCell
         return configureCellAtIndexPath(cell, ip: indexPath)
     }
 

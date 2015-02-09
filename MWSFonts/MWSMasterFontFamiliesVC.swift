@@ -50,7 +50,7 @@ class MWSMasterFontFamiliesVC: UITableViewController, UISplitViewControllerDeleg
         var familyNames = UIFont.familyNames() as! [String]
         familyNames.sort(<)
         for famName in familyNames {
-            var data = MWSFontFamily(familyName: famName, fontNames: UIFont.fontNamesForFamilyName(famName) as [String])
+            var data = MWSFontFamily(familyName: famName, fontNames: UIFont.fontNamesForFamilyName(famName) as! [String])
             fontFamilyNames.append(data)
         }
         println("fontFamilyNames.count:\(fontFamilyNames.count)")
@@ -66,7 +66,7 @@ class MWSMasterFontFamiliesVC: UITableViewController, UISplitViewControllerDeleg
     }
     
     override func viewWillAppear(animated: Bool) {
-        if let ip = tableView.indexPathForSelectedRow()? {
+        if let ip = tableView.indexPathForSelectedRow() {
             tableView.deselectRowAtIndexPath(ip, animated: true)
         }
     }
@@ -102,7 +102,7 @@ class MWSMasterFontFamiliesVC: UITableViewController, UISplitViewControllerDeleg
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(cellId, forIndexPath: indexPath) as UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier(cellId, forIndexPath: indexPath) as! UITableViewCell
 
         let data = fontFamilyNames[indexPath.row]
         let fName = data.familyName
