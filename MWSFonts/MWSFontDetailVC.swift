@@ -26,6 +26,7 @@
 
 import UIKit
 
+
 class MWSFontDetailVC: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate {
 
     @IBOutlet var lblPointSize: UILabel!
@@ -34,10 +35,10 @@ class MWSFontDetailVC: UIViewController, UITableViewDataSource, UITableViewDeleg
     @IBOutlet var textfield:    UITextField!
     
     var fontFamily: MWSFontFamily?
-    private var fonts:[String]! = [String]()
+    fileprivate var fonts:[String]! = [String]()
     
-    private let cellId = "FontCell_ID"
-    private let kTextLoremIpsum = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor " + 
+    fileprivate let cellId = "FontCell_ID"
+    fileprivate let kTextLoremIpsum = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor " + 
     "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco " +
     "laboris nisi ut aliquip ex ea commodo consequat."
    
@@ -47,44 +48,44 @@ class MWSFontDetailVC: UIViewController, UITableViewDataSource, UITableViewDeleg
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem()
+        navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
         navigationItem.leftItemsSupplementBackButton = true
         
         tableView.estimatedRowHeight = 200.0 //44.0
         tableView.rowHeight = UITableViewAutomaticDimension
 
         updatePlaceholderText()
-        textfield.addTarget(self, action: "textFieldDidChange:", forControlEvents: UIControlEvents.EditingChanged)
+        textfield.addTarget(self, action: #selector(self.textFieldDidChange(_:)), for: .editingChanged)
         
         if let fontFam = fontFamily {
             fonts = fontFamily!.fontNames
             self.title = "\(fontFam.familyName) (\(fonts.count))"
             updateFontSizeLabel()
         } else {
-            // On iPad, part of the detailVC view is displayed before
-            // a font family is selected from the masterVC
+            /// On iPad, at launch, part of the detailVC view is displayed
+            /// before a font family is selected from the masterVC
             self.title = "Font Family Not Selected"
         }
     }
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        // On iPhone, when a font family is selected from the masterVC,
-        // the tableView automatic row heights are set so that the cell
-        // labels are squashed a bit, i.e., there isn't a nice separation
-        // between the text at the bottom of the cell label and the 
-        // section title of the cell below.
-        //
-        // A call to update the cells, which also reloads the table, with
-        // a very short delay, lays out the cells properly.
-        //
-        // This issue does not occur on the iPad. Moreover, on the iPad,
-        // because the detailVC loads immediately before the fontFamily
-        // datasource var is set, without the check for fonts.isEmpty, the 
-        // app will crash in the configureCellAtIndexPath() method.
+        /// On iPhone, when a font family is selected from the masterVC,
+        /// the tableView automatic row heights are set so that the cell
+        /// labels are squashed a bit, i.e., there isn't a nice separation
+        /// between the text at the bottom of the cell label and the 
+        /// section title of the cell below.
+        ///
+        /// A call to update the cells, which also reloads the table, with
+        /// a very short delay, lays out the cells properly.
+        ///
+        /// This issue does not occur on the iPad. Moreover, on the iPad,
+        /// because the detailVC loads immediately before the fontFamily
+        /// datasource var is set, without the check for fonts.isEmpty, the 
+        /// app will crash in the configureCellAtIndexPath() method.
         let delay = Int64(0.05 * Double(NSEC_PER_SEC))
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delay), dispatch_get_main_queue()) { 
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(delay) / Double(NSEC_PER_SEC)) { 
             if (!self.fonts.isEmpty) {
                 self.updateVisibleCells()
                 self.updatePlaceholderText()
@@ -92,36 +93,36 @@ class MWSFontDetailVC: UIViewController, UITableViewDataSource, UITableViewDeleg
         }
     }
     
+    //MARK: Document this 
+    func hasFonts() -> Bool {
+        return !fonts.isEmpty
+    }
+
     
     //MARK: Textfield Methods
     
-    // Listen for a "clear button", i.e. empty text change to update cells.
-    // Otherwise, we only update in shouldReturn - not for every char entered.
-    func textFieldDidChange(textfield: UITextField) {
+    /// Listen for a "clear button", i.e. empty text change to update cells.
+    /// Otherwise, we only update in shouldReturn - not for every char entered.
+    func textFieldDidChange(_ textfield: UITextField) {
+        //LOG
 //        println("textfield.text changed to \(textfield.text)")
-        if textfield.text == nil || textfield.text.isEmpty {
+        if textfield.text == nil || (textfield.text?.isEmpty)! {
             updateVisibleCells()
         }
     }
     
     // Keyboard Done key handler
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textfield.resignFirstResponder()
         updateVisibleCells()
         return true
     }
     
-    // Note that textfield.text is present until this method returns true
-//    func textFieldShouldClear(textField: UITextField) -> Bool {
-////        println("should clear current text: \(textfield.text)")
-//        return true
-//    }
-    
     func updatePlaceholderText() {
         if !fonts.isEmpty {
             let fWord = (fonts.count > 1) ? "fonts" : "font"
             // Reduce length of text for iPhone
-            if (traitCollection.horizontalSizeClass == UIUserInterfaceSizeClass.Compact) {
+            if (traitCollection.horizontalSizeClass == UIUserInterfaceSizeClass.compact) {
                 textfield.placeholder = "Enter text, then update with Done key."
             } else {
                 textfield.placeholder = "Enter text for display in \(fWord). Update with Done key."
@@ -146,78 +147,77 @@ class MWSFontDetailVC: UIViewController, UITableViewDataSource, UITableViewDeleg
     func updateFontSizeLabel() {
         if !fonts.isEmpty {
 //            println(NSString(format: "%.01f", slider.value))
-            lblPointSize.text = (NSString(format: "%.01f", slider.value) as! String)
+            lblPointSize.text = (NSString(format: "%.01f", slider.value) as String)
         }
     }
     
     
     //MARK: Cell Utilites
     
-    func configureCellAtIndexPath(cell: UITableViewCell, ip: NSIndexPath) -> UITableViewCell {
+    func configureCellAtIndexPath(_ cell: inout UITableViewCell, ip: IndexPath) {
         cell.textLabel!.text = cellTextForIndexPath(ip)
         cell.textLabel!.numberOfLines = 0
-        cell.textLabel!.font = UIFont(name: fonts[ip.section], size: CGFloat(slider.value))
-        return cell
+        cell.textLabel!.font = UIFont(name: fonts[(ip as NSIndexPath).section], size: CGFloat(slider.value))
     }
     
     func updateVisibleCells() {
-        let visibleCells = tableView.visibleCells()
+        let visibleCells = tableView.visibleCells
         for idx in 0..<visibleCells.count {
-            var cell = visibleCells[idx] as! UITableViewCell
-            if let ip = tableView.indexPathForCell(cell) {
-                configureCellAtIndexPath(cell, ip: ip)
+            var cell = visibleCells[idx] 
+            if let ip = tableView.indexPath(for: cell) {
+                configureCellAtIndexPath(&cell, ip: ip)
             }
         }
         tableView.reloadData()
     }
 
-    func cellTextForIndexPath(indexPath: NSIndexPath) -> String {
-        if (count(textfield.text) > 0) { //textfield.text != nil && !textfield.text.isEmpty {
-            return textfield.text
+    func cellTextForIndexPath(_ indexPath: IndexPath) -> String {
+        if textfield.text != nil && !textfield.text!.isEmpty { 
+            return textfield.text!
         }
         return kTextLoremIpsum
     }
 
     func cellForEmptyTable() -> UITableViewCell {
-        let aCell = tableView.dequeueReusableCellWithIdentifier(cellId) as! UITableViewCell
-        aCell.textLabel?.text = "No font selection..."
-        aCell.textLabel?.textColor = UIColor.lightGrayColor()
-        return aCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellId)!
+        cell.textLabel?.text = "No font selection..."
+        cell.textLabel?.textColor = UIColor.lightGray
+        return cell
     }
     
     
     // MARK: - Table View
     
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         let count = fonts.count
         return (count > 0) ? count : 1
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
     }
     
-    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return (fonts.isEmpty) ? nil : fonts[section]
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if fonts.isEmpty {
             return cellForEmptyTable()
         }
         
-        let cell = tableView.dequeueReusableCellWithIdentifier(cellId, forIndexPath: indexPath) as! UITableViewCell
-        return configureCellAtIndexPath(cell, ip: indexPath)
+        var cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) 
+        configureCellAtIndexPath(&cell, ip: indexPath)
+        return cell
     }
 
-    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return false
     }
     
-    
     //MARK: UIViewController
     
-    override func traitCollectionDidChange(previousTraitCollection: UITraitCollection?) {
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         updatePlaceholderText()
     }
     

@@ -31,78 +31,108 @@ struct MWSFontFamily {
     let fontNames:  [String]
 }
 
+/// This is a somewhat contrived extension that returns the MWSFontDetailVC
+/// hasFonts() return value. It's used in the UISplitViewControllerDelegate
+/// splitViewController:collapseSecondary:onto: callback to determine if
+/// the master vc should be displayed or not.
+///
+/// .phone: 
+/// If a font selection has not been made and loaded into the detail vc,
+/// then the master should display. On iPhone this callback is called
+/// at launch before the views appear.
+///
+/// .pad:
+/// The splitViewController.preferredDisplayMode is set to .primaryOverlay
+/// in viewDidLoad, and the callback is not called, which results in the
+/// master displaying over the detail on iPad at launch.
+extension UISplitViewController {
+    func detailVcHasFontsLoaded() -> Bool {
+        if let detailNavCon = self.childViewControllers.first as? UINavigationController,
+            let detailVC = detailNavCon.topViewController as? MWSFontDetailVC {
+            return detailVC.hasFonts()
+        }
+        return false 
+    }
+}
 
 class MWSMasterFontFamiliesVC: UITableViewController, UISplitViewControllerDelegate {
 
-    private let cellId = "FontFamilyCell_ID"
-    private var shouldCollapseDetailVC = true
-    private var fontFamilyNames = [MWSFontFamily]()
+    fileprivate let cellId = "FontFamilyCell_ID"
+    fileprivate var fontFamilyNames = [MWSFontFamily]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // load font data
+        let familyNames = UIFont.familyNames.sorted(by: <)
+        for name in familyNames {
+            let data = MWSFontFamily(familyName: name, fontNames: UIFont.fontNames(forFamilyName: name) )
+            fontFamilyNames.append(data)
+        }        
+        //LOG
+//        print("fontFamilyNames.count:\(fontFamilyNames.count)")
     
-        if UIDevice.currentDevice().userInterfaceIdiom == .Pad {
-            self.clearsSelectionOnViewWillAppear = false
+        splitViewController?.delegate = self
+        /// At launch, we want the master displayed on any device.
+        self.splitViewController?.preferredDisplayMode = .primaryOverlay
+
+        self.clearsSelectionOnViewWillAppear = false
+        if UIDevice.current.userInterfaceIdiom == .pad {            
             self.preferredContentSize = CGSize(width: 320.0, height: 600.0)
         }
-
-        // load font data
-        var familyNames = UIFont.familyNames() as! [String]
-        familyNames.sort(<)
-        for famName in familyNames {
-            var data = MWSFontFamily(familyName: famName, fontNames: UIFont.fontNamesForFamilyName(famName) as! [String])
-            fontFamilyNames.append(data)
-        }
-        println("fontFamilyNames.count:\(fontFamilyNames.count)")
         
+        self.title = "iOS Font Families (\(fontFamilyNames.count))"
         navigationItem.backBarButtonItem = nil
         navigationItem.backBarButtonItem = UIBarButtonItem(title: " ", 
-            style: UIBarButtonItemStyle.Plain, 
+            style: UIBarButtonItemStyle.plain, 
             target: nil, 
-            action: nil)
-
-        self.title = "Font Families (\(fontFamilyNames.count))"
-        splitViewController?.delegate = self
+            action: nil)        
     }
     
-    override func viewWillAppear(animated: Bool) {
-        if let ip = tableView.indexPathForSelectedRow() {
-            tableView.deselectRowAtIndexPath(ip, animated: true)
+    /// Note that in viewDidLoad clearsSelectionOnViewWillAppear is set
+    /// to false. This is so that when returning from the detail vc to
+    /// the master vc, the selected family name row will still be
+    /// highlighted. Here, we deselect with animation.
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if let ip = tableView.indexPathForSelectedRow {
+            tableView.deselectRow(at: ip, animated: true)
         }
-    }
-  
-//    override func viewWillDisappear(animated: Bool) {
-//        if let ip = tableView.indexPathForSelectedRow()? {
-//            tableView.deselectRowAtIndexPath(ip, animated: true)
-//        }
-//    }
-    
+    }    
     
     // MARK: - Segues
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if let detailNavCon = segue.destinationViewController as? UINavigationController {
-            if let familyDetailVC = detailNavCon.topViewController as? MWSFontDetailVC {
-                if let selectedRowIndexPath = tableView.indexPathForSelectedRow() {
-                    let fontFamilyData = fontFamilyNames[selectedRowIndexPath.row] as MWSFontFamily
-                    familyDetailVC.fontFamily = fontFamilyData
-                }                
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let detailNavCon = segue.destination as? UINavigationController,
+            let familyDetailVC = detailNavCon.topViewController as? MWSFontDetailVC,
+            let selectedRowIndexPath = tableView.indexPathForSelectedRow {
+                let fontFamilyData = fontFamilyNames[selectedRowIndexPath.row] as MWSFontFamily
+                familyDetailVC.fontFamily = fontFamilyData
+            
+            /// On iPad, this dismisses the master vc when a table row is
+            /// selected.
+            if view.traitCollection.userInterfaceIdiom == .pad && splitViewController?.displayMode == .primaryOverlay {
+                UIView.animate(withDuration: 0.3, animations: { 
+                    self.splitViewController?.preferredDisplayMode = .primaryHidden
+                    }, completion: { (finished) in
+                        self.splitViewController?.preferredDisplayMode = .automatic
+                })
             }
         }
     }
 
     // MARK: - Table View
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return fontFamilyNames.count
     }
 
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(cellId, forIndexPath: indexPath) as! UITableViewCell
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) 
 
         let data = fontFamilyNames[indexPath.row]
         let fName = data.familyName
@@ -110,23 +140,21 @@ class MWSMasterFontFamiliesVC: UITableViewController, UISplitViewControllerDeleg
         return cell
     }
 
-    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
         return false
     }
 
-
-    // MARK: Table View Delegate
-    
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        shouldCollapseDetailVC = false
-    }
-
-    
     // MARK: - UISplitViewControllerDelegate
     
-    func splitViewController(splitViewController: UISplitViewController, collapseSecondaryViewController secondaryViewController: UIViewController!, ontoPrimaryViewController primaryViewController: UIViewController!) -> Bool {
-        return shouldCollapseDetailVC
+    func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
+       
+        var shouldCollapse = true
+        if view.traitCollection.userInterfaceIdiom != .pad {
+            shouldCollapse = !splitViewController.detailVcHasFontsLoaded()
+        }
+       
+        return shouldCollapse
     }
 
     
